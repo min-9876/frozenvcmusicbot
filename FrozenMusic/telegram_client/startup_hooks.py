@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 async def precheck_channels(client):
-    targets = ["@kustbots", "@kustbotschat"]
+    targets = ["@myanmar_music_Bot2027", "@myanmarbot_music"]
     for chan in targets:
         try:
             await client.join_chat(chan)
