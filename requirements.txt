@@ -1,6 +1,6 @@
 git+https://github.com/prashantsahlot/FrozenGram.git
-py-tgcalls
-yt-dlp
+py-tgcalls==0.9.8
+yt-dlp>=2025.01.15
 aiohttp
 flask
 Flask-RESTful
@@ -15,3 +15,4 @@ asyncpg
 pymongo
 aiofiles
 gender-guesser
+youtube-search
