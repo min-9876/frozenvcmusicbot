@@ -1696,8 +1696,8 @@ if __name__ == "__main__":
    # except Exception as e:
       #  logger.error(f"Failed to start connection watchdog task: {e}")
 
-  #  logger.info("→ Entering idle() (long-polling)")
-  #  idle()  
+    logger.info("→ Entering idle() (long-polling)")
+    idle()  
 
     try:
         bot.stop()
