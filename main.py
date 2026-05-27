@@ -1690,14 +1690,14 @@ if __name__ == "__main__":
         logger.error(f"❌ Failed to fetch assistant info: {e}")
 
     
-    logger.info("→ Starting connection watchdog (restarts container if no activity)...")
-    try:
-        asyncio.get_event_loop().create_task(connection_watchdog())
-    except Exception as e:
-        logger.error(f"Failed to start connection watchdog task: {e}")
+   # logger.info("→ Starting connection watchdog (restarts container if no activity)...")
+   # try:
+       # asyncio.get_event_loop().create_task(connection_watchdog())
+   # except Exception as e:
+      #  logger.error(f"Failed to start connection watchdog task: {e}")
 
-    logger.info("→ Entering idle() (long-polling)")
-    idle()  
+  #  logger.info("→ Entering idle() (long-polling)")
+  #  idle()  
 
     try:
         bot.stop()
