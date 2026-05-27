@@ -1,6 +1,6 @@
 git+https://github.com/prashantsahlot/FrozenGram.git
 py-tgcalls
-yt-dlp>=2025.01.15
+yt-dlp
 aiohttp
 flask
 Flask-RESTful
