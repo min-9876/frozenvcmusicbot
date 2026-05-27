@@ -58,7 +58,7 @@ from FrozenMusic.vector_text_tools import vectorized_unicode_boldifier
 from FrozenMusic.telegram_client.startup_hooks import precheck_channels
 from collections import deque
 
-# 🔍 အပြင် API မလိုဘဲ Python ထဲ တိုက်ရိုက်ရှာဖွေရန် Library ကို Import လုပ်ခြင်း
+# 🔍 YouTube Search Library
 from youtube_search import YoutubeSearch
 
 load_dotenv()
@@ -242,13 +242,21 @@ def iso8601_to_human_readable(iso_duration):
     except Exception as e:
         return "Unknown duration"
 
-# 🛠️ ပြင်ဆင်ပြီးသား နေရာ - အပြင် API မလိုဘဲ Python ထဲတွင်တင် တိုက်ရိုက် ရှာဖွေပေးမည့် Function
+# 🛠️ ပြင်ဆင်ပြီးသား နေရာ - ကုတ်ထဲတွင် ကွတ်ကီး တစ်ခါတည်းထည့်၍ ရှာဖွေပေးမည့် Function
 async def fetch_youtube_link(query):
     try:
         loop = asyncio.get_event_loop()
-        results = await loop.run_in_executor(
-            None, lambda: YoutubeSearch(query, max_results=1).to_dict()
-        )
+        
+        # 🍪 ယူကျုးကွတ်ကီး (Cookies) စာသားကို အောက်က မျက်တောင်ဖျားထဲမှာ အစားထိုးထည့်ပေးပါဗျာ
+        youtube_cookie = "ဒီနေရာမှာ_သင့်ရဲ့_YouTube_Cookie_စာသားအရှည်ကြီးကို_ထည့်ပါ"
+
+        def search_with_cookie():
+            if youtube_cookie and youtube_cookie != "ဒီနေရာမှာ_သင့်ရဲ့_YouTube_Cookie_စာသားအရှည်ကြီးကို_ထည့်ပါ":
+                return YoutubeSearch(query, max_results=1, cookies=youtube_cookie).to_dict()
+            else:
+                return YoutubeSearch(query, max_results=1).to_dict()
+
+        results = await loop.run_in_executor(None, search_with_cookie)
         
         if not results:
             raise Exception("No results found on YouTube")
@@ -259,7 +267,6 @@ async def fetch_youtube_link(query):
         title = video["title"]
         duration_str = video.get("duration", "0:00")
         
-        # duration_str (MM:SS) ကို ကုဒ်အောက်ပိုင်း အဆင်ပြေအောင် ISO 8601 ပုံစံ ပြောင်းလဲခြင်း
         if ":" in duration_str:
             parts = duration_str.split(":")
             if len(parts) == 2:
@@ -277,9 +284,8 @@ async def fetch_youtube_link(query):
         return (video_url, title, duration_iso, thumb)
 
     except Exception as e:
-        raise Exception(f"Local Python Search failed: {str(e)}")
+        raise Exception(f"Local Python Search with Cookie failed: {str(e)}")
     
-# Backup အပိုင်းကိုလည်း အလုပ်လုပ်အောင် Local Search သို့ပင် ပတ်ထားလိုက်သည်
 async def fetch_youtube_link_backup(query):
     return await fetch_youtube_link(query)
     
@@ -341,7 +347,7 @@ async def start_handler(_, message):
         ">✨ 𝗔𝗨𝗧𝗢-𝗦𝗨𝗚𝗚𝗘𝗦𝗧𝗜𝗢𝗡𝗦 when queue ends\n"
         ">🛠️ 𝗔𝗗𝗠𝗜𝗡 𝗖𝗢𝗠𝗠𝗔𝗡𝗗𝗦: Pause, Resume, Skip, Stop, Mute, Unmute, Tmute, Kick, ?Ban, Unban\n"
         ">**အရာအားလုံးအကောင်းလို့ပဲ မြင်တယ်**\n"
-        f"๏ ᴄʟɪᴄ尋  {help_text} ʙ壓ʟᴏᴡ ғᴏʀ ᴄᴏᴍᴍᴀɴᴅ ʟɪsᴛ."
+        f"๏ ᴄʟɪᴄ尋  {help_text} ʙ壓ʟᴏᴡ ғᴏʀ ᴄOM𝗠𝗔𝗡𝗗 ʟɪsᴛ."
     )
 
     buttons = [
@@ -1048,9 +1054,9 @@ async def song_command_handler(_, message):
         [[InlineKeyboardButton("🎶 Download Now", url="https://t.me/MYANMAR_FM_BOT?start=true")]]
     )
     text = (
-        "<b>ᴄʟɪᴄᴋ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ᴜsᴇ ᴛʜᴇ sᴏɴɢ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ ʙᴏᴛ. 🎵</b>\n\n"
-        "ʏᴏᴜ ᴄᴀɴ sᴇɴᴅ ᴛʜᴇ sᴏɴɢ ɴᴀᴍᴇ ᴏʀ ᴀɴʏ ǫᴜᴇʀʏ ᴅɪʀᴇᴄᴛʟ體 ᴛᴏ ᴛʜᴇ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ ʙᴏᴛ, ⬇️\n\n"
-        "ᴀɴᴅ ɪᴛ ᴡɪʟʟ ғᴇᴛᴄʜ ᴀɴᴅ ᴅᴏᴡɴʟᴏᴀᴅ ᴛʜᴇ sᴏɴɢ ғᴏʀ ʏᴏᴜ. 🚀"
+        "<b>ᴄʟɪᴄᴋ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ᴜsေ ᴛʜေ sᴏɴɢ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ ʙᴏᴛ. 🎵</b>\n\n"
+        "ʏᴏᴜ ᴄᴀɴ sᴇɴᴅ ᴛʜᴇ sᴏɴɢ ɴᴀᴍေ ᴏʀ ᴀɴʏ ǫᴜေʀʏ ᴅɪʀေᴄᴛʟ體 ᴛᴏ ᴛʜေ ᴅᴏᴡɴʟᴏᴀᴅေʀ ʙᴏᴛ, ⬇️\n\n"
+        "ᴀɴᴅ ɪᴛ ᴡɪʟʟ ғေᴛᴄʜ ᴀɴᴅ ᴅᴏᴡɴʟᴏᴀᴅ ᴛʜေ sᴏɴɢ ғᴏʀ ʏᴏᴜ. 🚀"
     )
     await message.reply(text, reply_markup=keyboard)
 
@@ -1299,4 +1305,3 @@ if __name__ == "__main__":
         logger.warning(f"Bot stop failed or already stopped: {e}")
 
     logger.info("✅ All services are up and running. Bot started successfully.")
-
