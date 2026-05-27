@@ -440,8 +440,19 @@ async def ping_handler(_, message):
 
 # --- Bot အသက်သွင်းခြင်း ---
 if __name__ == "__main__":
+    print("→ Starting PyTgCalls client...")
     call_py.start()
+    
+    print("→ Starting Bot client...")
     bot.start()
-    assistant.start()
+    
+    #  ဒီနေရာကို စစ်ဆေးပြီးမှ start လုပ်အောင် ပြင်လိုက်ပါတယ်
+    if not assistant.is_connected:
+        print("→ Starting Assistant client...")
+        assistant.start()
+    else:
+        print("ℹ️ Assistant is already connected.")
+
     print("✅ Bot is online!")
     idle()
+
