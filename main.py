@@ -438,70 +438,76 @@ async def ping_handler(_, message):
     end = time.time()
     await msg.edit(f"🏓 **Pong!**\nLatency: {round((end - start) * 1000)}ms")
 
-# --- Bot အသက်သွင်းခြင်း (အစီအစဉ်အမှန်အတိုင်း ပြန်ပြင်ထားသည်) ---
+# --- Bot အသက်သွင်းခြင်း (NameError ကင်းစင်အောင် ပြင်ဆင်ပြီး) ---
 if __name__ == "__main__":
-    logger.info("Loading persisted state from MongoDB...")
-    load_state_from_db()
-    logger.info("State loaded successfully.")
+    print("→ Loading persisted state from MongoDB...")
+    try:
+        load_state_from_db()
+        print("→ State loaded successfully.")
+    except Exception as e:
+        print(f"ℹ️ Note on state load: {e}")
 
     # ၁။ Bot Client ကို အရင်ဆုံး စဖွင့်ရပါမယ်
-    logger.info("→ Starting Telegram bot client (bot.start)...")
+    print("→ Starting Telegram bot client (bot.start)...")
     try:
         bot.start()
-        logger.info("Telegram bot has started.")
+        print("→ Telegram bot has started.")
     except Exception as e:
-        logger.error(f"❌ Failed to start Pyrogram bot client: {e}")
+        print(f"❌ Failed to start Pyrogram bot client: {e}")
         sys.exit(1)
 
-    me = bot.get_me()
-    BOT_NAME = me.first_name or "HAN THAR Music"
-    BOT_USERNAME = me.username or os.getenv("BOT_USERNAME", "MYANMAR_FM_BOT")
-    BOT_LINK = f"https://t.me/{BOT_USERNAME}"
+    try:
+        me = bot.get_me()
+        BOT_NAME = me.first_name or "HAN THAR Music"
+        BOT_USERNAME = me.username or os.getenv("BOT_USERNAME", "MYANMAR_FM_BOT")
+        BOT_LINK = f"https://t.me/{BOT_USERNAME}"
 
-    logger.info(f"✅ Bot Name: {BOT_NAME!r}")
-    logger.info(f"✅ Bot Username: {BOT_USERNAME}")
-    logger.info(f"✅ Bot Link: {BOT_LINK}")
+        print(f"✅ Bot Name: {BOT_NAME!r}")
+        print(f"✅ Bot Username: {BOT_USERNAME}")
+        print(f"✅ Bot Link: {BOT_LINK}")
+    except Exception as e:
+        print(f"⚠️ Failed to fetch bot details: {e}")
 
     # ၂။ Assistant အကောင့်ကို ဒုတိယမြောက် စစ်ဆေးပြီး ဖွင့်ပါမယ်
     if not assistant.is_connected:
-        logger.info("Assistant not connected; starting assistant client...")
+        print("→ Assistant not connected; starting assistant client...")
         try:
             assistant.start()
-            logger.info("Assistant client connected.")
+            print("→ Assistant client connected.")
         except Exception as e:
-            logger.error(f"❌ Failed to start Assistant client: {e}")
+            print(f"❌ Failed to start Assistant client: {e}")
     else:
-        logger.info("ℹ️ Assistant is already connected.")
+        print("ℹ️ Assistant is already connected.")
 
     try:
         assistant_user = assistant.get_me()
         ASSISTANT_USERNAME = assistant_user.username
         ASSISTANT_CHAT_ID = assistant_user.id
-        logger.info(f"✨ Assistant Username: {ASSISTANT_USERNAME}")
-        logger.info(f"💕 Assistant Chat ID: {ASSISTANT_CHAT_ID}")
+        print(f"✨ Assistant Username: {ASSISTANT_USERNAME}")
+        print(f"💕 Assistant Chat ID: {ASSISTANT_CHAT_ID}")
 
         # Precheck hooks တွေကို ခေါ်ပါတယ်
         asyncio.get_event_loop().run_until_complete(precheck_channels(assistant))
-        logger.info("✅ Assistant precheck completed.")
+        print("✅ Assistant precheck completed.")
     except Exception as e:
-        logger.error(f"❌ Failed to fetch assistant info: {e}")
+        print(f"❌ Failed to fetch assistant info: {e}")
 
-    # ၃။ Bot ရော Assistant ရော ပွင့်သွားပြီဆိုမှ Voice Chat ကို ကိုင်တွယ်မယ့် PyTgCalls ကို ဖွင့်ပါမယ်
-    logger.info("→ Starting PyTgCalls client...")
+    # ၃။ Voice Chat ကို ကိုင်တွယ်မယ့် PyTgCalls ကို ဖွင့်ပါမယ်
+    print("→ Starting PyTgCalls client...")
     try:
         call_py.start()
-        logger.info("PyTgCalls client started successfully.")
+        print("✅ PyTgCalls client started successfully.")
     except Exception as e:
-        logger.error(f"❌ Failed to start PyTgCalls: {e}")
+        print(f"❌ Failed to start PyTgCalls: {e}")
 
-    logger.info("→ Entering idle() (long-polling) - Bot is fully Online! 🔥")
+    print("🔥 Entering idle() (long-polling) - Bot is fully Online! 🔥")
     idle()  
 
     # ပိတ်သိမ်းတဲ့အပိုင်း
     try:
         bot.stop()
-        logger.info("Bot stopped.")
+        print("→ Bot stopped.")
     except Exception as e:
-        logger.warning(f"Bot stop failed or already stopped: {e}")
+        print(f"ℹ️ Bot stop failed or already stopped: {e}")
 
-    logger.info("✅ All services are up and running. Bot started successfully.")
+    print("✅ All services closed clean.")
